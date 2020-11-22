@@ -1,0 +1,23 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  employer: one
+  par_type: MyString
+  description: MyText
+  status: MyString
+  charged_person: 1
+  comments: MyText
+  value: 1
+  client_id: 1
+  client_name: MyString
+
+two:
+  employer: two
+  par_type: MyString
+  description: MyText
+  status: MyString
+  charged_person: 1
+  comments: MyText
+  value: 1
+  client_id: 1
+  client_name: MyString

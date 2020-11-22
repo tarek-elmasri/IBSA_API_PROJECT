@@ -1,0 +1,9 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  employer: one
+  cs_manager: one
+
+two:
+  employer: two
+  cs_manager: two
