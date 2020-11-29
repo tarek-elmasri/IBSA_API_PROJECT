@@ -2,11 +2,11 @@ class Employer < ApplicationRecord
   has_secure_password
   has_many :pars
   validates :username , length: {minimum: 4}
-  validates :email , presence: true
+  validates :email , presence: true , uniqueness: true
   validates :role , presence: true
 
   def auth_by_email
-    user=Employer.find_by(email: self.email)
+    user=Employer.find_by(email: self.email.downcase)
         .try(:authenticate , self.password)
   end
 
@@ -25,7 +25,13 @@ class Employer < ApplicationRecord
     secret_key='123456789'
     user_data= {email: self.email , role: self.role , exp: exp}
     token = JWT.encode(user_data , secret_key)
-    return data={username: self.username , email: self.email , role: self.role , token: token}
+    return data={id: self.id, username: self.username , email: self.email , role: self.role , token: token}
+  end
+
+  def downcase_email
+    email= self.email.downcase
+    self.email= email
+    return self
   end
 
 end

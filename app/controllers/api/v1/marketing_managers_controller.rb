@@ -24,6 +24,11 @@ class Api::V1::MarketingManagersController < ApplicationController
     render json: {pars: pars},status: :ok
   end
 
+  def my_pending_pars
+    pars=Par.where(employer_id: @classified_user.employer_id , status:'pending')
+    render json: {pars: pars},status: :ok
+  end
+
   def approval_list
     pars= Par.where(charged_person: @current_user.id)
     render json: {pars: pars},status: :ok

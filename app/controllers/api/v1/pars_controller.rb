@@ -6,9 +6,12 @@ class Api::V1::ParsController < ApplicationController
   def create
 
     par= Par.new(pars_params)
+    par.client_id = 0 unless par.client_id
     par.status='pending'
     par.employer_id = @classified_user.employer_id
+    par.requester = @current_user.username
     par.charged_person = @manager_id
+    par.modified=false
     par.track_status= "pending at #{@manager_name}"
     if par.save
       render json: {par: par},status: :created
@@ -22,6 +25,11 @@ class Api::V1::ParsController < ApplicationController
 
   def my_pars
     pars= Par.where(employer_id: @classified_user.employer_id).order(updated_at: :desc)
+    render json: {pars: pars},status: :ok
+  end
+
+  def my_pending_pars
+    pars= Par.where(employer_id: @classified_user.employer_id , status:"pending").order(updated_at: :desc)
     render json: {pars: pars},status: :ok
   end
 
@@ -101,7 +109,7 @@ class Api::V1::ParsController < ApplicationController
     if par&.charged_person == @classified_user.employer_id && par.status=='pending'
         par.update_attribute(:track_status , "commented by #{@current_user.username}")
         par.update_attribute(:modified , false)
-        par.update_attribute(:comments , params.permit(:comments))
+        par.update(params.permit(:comments))
         render json:{par: par},status: :ok
     else
       render json:{errors: ['Un Authorized Action']},status: :unauthorized
@@ -134,26 +142,16 @@ class Api::V1::ParsController < ApplicationController
   def find_par
     par=Par.find_by(id: params[:id])
     pars=[]
-    case @current_user.role
-    when 'DM'
-      med_reps= @classified_user.medical_reps.all
-      med_reps.each do |med_rep| 
-        pars.push(Par.where(employer_id: med_rep.employer_id))
-      end
-    when 'MM'
-      dms=@classified_user.area_managers.all
-      dms.each do |dm| 
-        pars.push(Par.where(employer_id: dm.employer_id))
-        med_reps= dm.medical_reps.all
+
+    if par
+      case @current_user.role
+      when 'DM'
+        med_reps= @classified_user.medical_reps.all
         med_reps.each do |med_rep| 
           pars.push(Par.where(employer_id: med_rep.employer_id))
         end
-      end
-    when 'CSM'
-      mms= @classified_user.marketing_managers.all
-      mms.each do |mm| 
-        pars.push(Par.where(employer_id: mm.employer_id))
-        dms=mm.area_managers.all
+      when 'MM'
+        dms=@classified_user.area_managers.all
         dms.each do |dm| 
           pars.push(Par.where(employer_id: dm.employer_id))
           med_reps= dm.medical_reps.all
@@ -161,22 +159,63 @@ class Api::V1::ParsController < ApplicationController
             pars.push(Par.where(employer_id: med_rep.employer_id))
           end
         end
+      when 'CSM'
+        mms= @classified_user.marketing_managers.all
+        mms.each do |mm| 
+          pars.push(Par.where(employer_id: mm.employer_id))
+          dms=mm.area_managers.all
+          dms.each do |dm| 
+            pars.push(Par.where(employer_id: dm.employer_id))
+            med_reps= dm.medical_reps.all
+            med_reps.each do |med_rep| 
+              pars.push(Par.where(employer_id: med_rep.employer_id))
+            end
+          end
+        end
+      when 'GM'
+        pars.push(Par.all)
       end
-    when 'GM'
-      pars.push(Par.all)
-    end
 
-    pars.push(@current_user.pars)
-    pars_list = pars.flatten
+      pars.push(@current_user.pars)
+      pars_list = pars.flatten
 
-    if pars_list.include?(par)
-      render json:{par: par},status: :ok
+      if pars_list.include?(par)
+        render json:{par: par},status: :ok
+      else
+        render json:{errors: ['You don\'t have access to this par']},status: :unauthorized
+      end
     else
-      render json:{errors: ['You don\'t have access to this par']},status: :unauthorized
+      render json:{errors: ['Invalid PAR ID.']},status: :unprocessable_entity
     end
   end
 
+  def get_par_data
+    par=Par.find_by(id: params[:id])
+    
+    if par
+      if par.employer_id== @current_user.id 
+        render json: {par: par},status: :ok
+      else
+        render json: {errors: ['UnAuthorized action']},status: :unauthorized
+      end
+    else
+      render json: {errors: ['Invalid PAR ID']},status: :unprocessable_entity
+    end
+  end
 
+  def get_par_comment
+    par=Par.find_by(id: params[:id])
+    
+    if par
+      if par.charged_person== @current_user.id 
+        render json: {par: par},status: :ok
+      else
+        render json: {errors: ['UnAuthorized action']},status: :unauthorized
+      end
+    else
+      render json: {errors: ['Invalid PAR ID']},status: :unprocessable_entity
+    end
+  end
 
   private
   def pars_params

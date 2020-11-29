@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_11_21_064332) do
+ActiveRecord::Schema.define(version: 2020_11_29_210932) do
 
   create_table "area_managers", force: :cascade do |t|
     t.integer "employer_id", null: false
@@ -19,6 +19,13 @@ ActiveRecord::Schema.define(version: 2020_11_21_064332) do
     t.datetime "updated_at", precision: 6, null: false
     t.index ["employer_id"], name: "index_area_managers_on_employer_id"
     t.index ["marketing_manager_id"], name: "index_area_managers_on_marketing_manager_id"
+  end
+
+  create_table "clients", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.integer "client_id"
   end
 
   create_table "cs_managers", force: :cascade do |t|
@@ -79,6 +86,7 @@ ActiveRecord::Schema.define(version: 2020_11_21_064332) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "track_status"
     t.boolean "modified", default: true
+    t.string "requester"
     t.index ["employer_id"], name: "index_pars_on_employer_id"
   end
 
