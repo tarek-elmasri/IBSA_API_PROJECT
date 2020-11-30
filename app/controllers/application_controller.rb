@@ -10,19 +10,19 @@ class ApplicationController < ActionController::API
   def Classify_user
     case @current_user.role
     when 'MR'
-      @classified_user = MedicalRep.find_by(Employer_id: @current_user.id)
+      @classified_user = MedicalRep.find_by(employer_id: @current_user.id)
       @manager_id = AreaManager.find_by(id: @classified_user.area_manager_id)&.employer_id
     when 'GM'
-      @classified_user = GeneralManager.find_by(Employer_id: @current_user.id)
+      @classified_user = GeneralManager.find_by(employer_id: @current_user.id)
       @manager_id= @current_user.id
     when 'CSM'
-      @classified_user = CsManager.find_by(Employer_id: @current_user.id)
+      @classified_user = CsManager.find_by(employer_id: @current_user.id)
       @manager_id = GeneralManager.find_by(id: @classified_user.general_manager_id)&.employer_id
     when 'MM'
-      @classified_user = MarketingManager.find_by(Employer_id: @current_user.id)
+      @classified_user = MarketingManager.find_by(employer_id: @current_user.id)
       @manager_id = CsManager.find_by(id: @classified_user.cs_manager_id)&.employer_id
     when 'DM'
-      @classified_user = AreaManager.find_by(Employer_id: @current_user.id)
+      @classified_user = AreaManager.find_by(employer_id: @current_user.id)
       @manager_id = MarketingManager.find_by(id: @classified_user.marketing_manager_id)&.employer_id
     end
     @manager_name= Employer.find_by(id: @manager_id)&.username
