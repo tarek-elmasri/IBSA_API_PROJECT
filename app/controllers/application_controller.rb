@@ -4,6 +4,8 @@ class ApplicationController < ActionController::API
     token = request.headers['Authorization']
     @current_user = Employer.new.auth_by_token(token)
     render json:{errors: ['Invalid or expired token']},status: :unauthorized unless @current_user.present?
+    
+    Classify_user
   end
 
 

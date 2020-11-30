@@ -1,7 +1,7 @@
 class Api::V1::ParsController < ApplicationController
 
   before_action :Authenticate_user
-  before_action :Classify_user
+  
 
   def create
 
