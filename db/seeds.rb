@@ -11,6 +11,5 @@ Client.create(client_id: 1002 , name: "Banoon Medical Center")
 Client.create(client_id: 1003 , name: "Soliman AL-Habib")
 Client.create(client_id: 1004 , name: "Al-Falah Hospital")
 Client.create(client_id: 1005, name: "Obiad Hospital")
-Client.create(client_id:1000000 , name: "Soliman Al-Habib Hospital")
 
-Employer.create(username: "IBSA_Admin" , email: "ibsa_admin@ibsagulf.com" , password: "12345" , password_confirmation: "12345" , role: "GM")
+Employer.create(username: "IBSA Admin" , email: "ibsa_admin@ibsagulf.com" , password: "12345" , password_confirmation: "12345" , role: "GM")
